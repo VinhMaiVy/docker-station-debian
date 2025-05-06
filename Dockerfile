@@ -18,14 +18,12 @@ ENV HOME=/home/${WEBUSERNAME}
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
-RUN apt-get -y install net-tools lsof passwd bzip2 sudo wget which vim nano
+RUN apt-get -y install net-tools passwd bzip2 sudo wget which vim
 RUN apt-get -y install samba samba-common samba-client cifs-utils tini supervisor
 RUN apt-get -y install openssh-server openssh-client
 RUN apt-get -y install build-essential git automake autoconf
-RUN apt-get -y install libcurl4-openssl-dev libxml2-dev libssh-dev libxml2-dev libssl-dev
+RUN apt-get -y install libcurl4-openssl-dev libxml2-dev libssh-dev
 RUN apt-get -y install python3 python3-dev python3-numpy python3-pip
-
-#RUN alternatives --set python3 /usr/bin/python3.9
 
 # Compile and add Extra Themes for Icewm
 ADD ./tgz/icewm-extra-themes.tgz /tmp/
@@ -103,7 +101,7 @@ RUN ln -fs /home/${WEBUSERNAME}/.vnc/passwd.cm/passwd /home/${WEBUSERNAME}/.vnc/
 RUN mkdir /home/${WEBUSERNAME}/.icewm
 COPY ./webuser/dot-icewm/ /home/${WEBUSERNAME}/.icewm/
 
-RUN chown -R 1026:100 /home/${WEBUSERNAME}
+RUN chown -R ${WEBUSERNAME}:users /home/${WEBUSERNAME}
 
 # #################################################
 RUN sed -i "s/webusername/${WEBUSERNAME}/g" /etc/supervisord.d/icewm-session.ini
