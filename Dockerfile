@@ -5,7 +5,7 @@
 FROM debian:trixie
 
 # Setup argument default and enviroment variables
-ARG WEBUSERNAME=rockyuser
+ARG WEBUSERNAME=webuser
 
 ENV WEBUSERNAME=${WEBUSERNAME}
 ENV WEBUSERADMIN=administrator
@@ -39,15 +39,17 @@ RUN rm -rf /tmp/icewm-extra-themes
 RUN ssh-keygen -A
 
 # Set locale
-ENV LC_ALL=en_US.UTF-8
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US.UTF-8
+RUN apt-get -y install locales 
+RUN echo "LC_ALL=en_US.UTF-8" >> /etc/environment
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+RUN echo "LANG=en_US.UTF-8" > /etc/locale.conf
+RUN /usr/sbin/locale-gen
 
 
 # Install icewm and tightvnc server.
 # #################################################
 RUN apt-get -y install icewm
-RUN apt-get -y install xterm firefox-esr
+RUN apt-get -y install xterm xfonts-terminus firefox-esr
 RUN apt-get -y install tigervnc-standalone-server 
 RUN /bin/dbus-uuidgen > /etc/machine-id
 
@@ -57,6 +59,7 @@ RUN /bin/dbus-uuidgen > /etc/machine-id
 # RUN /usr/bin/pip3 install wheel
 RUN apt-get -y install python3-pip-whl python3-websockify
 RUN apt-get -y install novnc 
+RUN cp /usr/share/novnc/vnc.html /usr/share/novnc/index.html
 
 # Setup Supervisord
 # #################################################
@@ -79,16 +82,14 @@ RUN chown -R ${WEBUSERADMIN}:${WEBUSERADMIN} /home/${WEBUSERADMIN}
 
 # Set up User (${WEBUSERNAME})
 # #################################################
-RUN groupadd -g 59555 secshost
-RUN useradd -u 7700 -g 59555 -s /bin/bash -m -b /home secshost_adm
-RUN useradd -u 1094 -g 59555 -s /bin/bash -m -b /home ${WEBUSERNAME}
+RUN useradd -u 1026 -g 100 -s /bin/bash -m -b /home ${WEBUSERNAME}
 
 COPY ./local/dot-bashrc /home/${WEBUSERNAME}/.bashrc
 
 RUN mkdir /home/${WEBUSERNAME}/.ssh
 COPY authorized_keys /home/${WEBUSERNAME}/.ssh/authorized_keys
-COPY ./local/id_rsa.svc_secshost /home/${WEBUSERNAME}/.ssh/id_rsa
-COPY ./local/id_rsa-pub.svc_secshost /home/${WEBUSERNAME}/.ssh/id_rsa.pub
+COPY ./local/id_rsa.svc_webuser /home/${WEBUSERNAME}/.ssh/id_rsa
+COPY ./local/id_rsa-pub.svc_webuser /home/${WEBUSERNAME}/.ssh/id_rsa.pub
 RUN chmod -R go-rwx /home/${WEBUSERNAME}/.ssh
 RUN touch /home/${WEBUSERNAME}/.Xauthority
 RUN chmod go-rwx /home/${WEBUSERNAME}/.Xauthority
@@ -102,7 +103,7 @@ RUN ln -fs /home/${WEBUSERNAME}/.vnc/passwd.cm/passwd /home/${WEBUSERNAME}/.vnc/
 RUN mkdir /home/${WEBUSERNAME}/.icewm
 COPY ./webuser/dot-icewm/ /home/${WEBUSERNAME}/.icewm/
 
-RUN chown -R 1094:59555 /home/${WEBUSERNAME}
+RUN chown -R 1026:100 /home/${WEBUSERNAME}
 
 # #################################################
 RUN sed -i "s/webusername/${WEBUSERNAME}/g" /etc/supervisord.d/icewm-session.ini
