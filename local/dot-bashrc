@@ -1,0 +1,40 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/bin:" ]]
+then
+    PATH="$HOME/bin:$PATH"
+fi
+export PATH
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias la='ls -latr'
+
+# Oracle rdbms
+export ORACLE_BASE=/usr/local/apps/OracleBase
+export ORACLE_HOME=$ORACLE_BASE/instantclient_19_16
+export TNS_ADMIN=$ORACLE_HOME/network/admin
+export LD_LIBRARY_PATH=/lib64/:$ORACLE_HOME
+export ORACLE_SID=OREO
+export TWO_TASK=OREO
+
+# Java
+export CLASSPATH="/usr/local/lib/sqljdbc_4.2/jre8:$ORACLE_HOME"
+
+# Tcl-tk
+export TCLLIBPATH=" /lib64/tcl8.6 /usr/share/tcl8.6 /usr/local/lib "
+
+export PATH="$PATH:/opt/mssql-tools18/bin:$ORACLE_HOME"
+

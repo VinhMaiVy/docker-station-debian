@@ -1,0 +1,7 @@
+demo()
+demo(package = .packages(all.available = TRUE))
+demo(graphics)
+demo(image)
+demo(RealInt)
+demo(nlm)
+q()
